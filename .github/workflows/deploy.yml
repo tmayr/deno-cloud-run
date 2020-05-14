@@ -1,0 +1,26 @@
+name: "Deploy"
+on:
+  push:
+    branches: "*"
+
+env:
+  APP_NAME: deno-cloud-run
+
+jobs:
+  deploy:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v1"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        name: Setup gcloud SDK
+        with:
+          version: "284.0.0"
+          service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Deploy
+        run: ./create-deploy.sh
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
